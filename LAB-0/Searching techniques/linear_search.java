@@ -16,7 +16,7 @@ public class lsearch {
 		int key = read.nextInt();
 		boolean pos = linearSearch(arr, key);		
 		if (pos != false){
-			System.out.println("Key is found at position " + pos);
+			System.out.println("Key is found");
 		}
 		else {
 			System.out.println("Key is not found");
