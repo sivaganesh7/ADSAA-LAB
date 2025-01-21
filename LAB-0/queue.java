@@ -73,9 +73,8 @@ public class queue1 {
         q.display();
       
         // Delete elements
-        q.dequeue(); 
         q.dequeue();
-        System.out.println("After two node deletions:");
+        System.out.println("After node deletion:");
 
         q.display();
       
