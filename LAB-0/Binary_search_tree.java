@@ -1,99 +1,66 @@
-// Binary Search Tree implementation in Java
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-class Node {
-    int value;
-    Node left, right;
+class BST {
+    static class Node {
+        int data;
+        Node left, right;
 
-    public Node(int value) {
-        this.value = value;
-        left = right = null;
-    }
-}
-
-class BinarySearchTree {
-    private Node root;
-
-    // Constructor
-    public BinarySearchTree() {
-        root = null;
-    }
-
-    // Method to add a value to the tree
-    public void add(int value) {
-        root = addRecursive(root, value);
-    }
-
-    // Recursive method for adding a value
-    private Node addRecursive(Node current, int value) {
-        if (current == null) {
-            return new Node(value);
+        Node(int data) {
+            this.data = data;
+            this.left = this.right = null;
         }
+    }
 
-        if (value < current.value) {
-            current.left = addRecursive(current.left, value);
-        } else if (value > current.value) {
-            current.right = addRecursive(current.right, value);
+    private Node root = null;
+
+    public void insert(int item) {
+        root = insertRec(root, item);
+    }
+
+    private Node insertRec(Node root, int item) {
+        if (root == null) {
+            return new Node(item);
         }
-
-        return current;
-    }
-
-    // Method to check if a value exists in the tree
-    public boolean contains(int value) {
-        return containsRecursive(root, value);
-    }
-
-    // Recursive method to check if a value exists
-    private boolean containsRecursive(Node current, int value) {
-        if (current == null) {
-            return false;
+        if (item < root.data) {
+            root.left = insertRec(root.left, item);
+        } else if (item > root.data) {
+            root.right = insertRec(root.right, item);
         }
-        if (value == current.value) {
-            return true;
-        }
-        return value < current.value 
-            ? containsRecursive(current.left, value) 
-            : containsRecursive(current.right, value);
+        return root;
     }
 
-    // Method to perform in-order traversal
-    public void traverseInOrder() {
-        traverseInOrderRecursive(root);
-        System.out.println();
+    // Print the tree in a structured format
+    public void printTree() {
+        printTreeRec(root, "", true);
     }
 
-    // Recursive method for in-order traversal
-    private void traverseInOrderRecursive(Node node) {
+    private void printTreeRec(Node node, String prefix, boolean isRight) {
         if (node != null) {
-            traverseInOrderRecursive(node.left);
-            System.out.print(node.value + " ");
-            traverseInOrderRecursive(node.right);
+            System.out.println(prefix + (isRight ? "R----" : "L----") + node.data);
+            printTreeRec(node.left, prefix + (isRight ? "   " : "|  "), false);
+            printTreeRec(node.right, prefix + (isRight ? "   " : "|  "), true);
         }
     }
-}
 
-// Main class to demonstrate Binary Search Tree
-public class Main {
-    public static void main(String[] args) {
-        BinarySearchTree bst = new BinarySearchTree();
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        BST bst = new BST();
+        String choice;
 
-        // Adding elements to the BST
-        bst.add(50);
-        bst.add(30);
-        bst.add(70);
-        bst.add(20);
-        bst.add(40);
-        bst.add(60);
-        bst.add(80);
+        // Input elements into the BST
+        do {
+            System.out.print("Enter the Element: ");
+            int item = Integer.parseInt(reader.readLine());
+            bst.insert(item);
 
-        // In-order traversal
-        System.out.println("In-order Traversal:");
-        bst.traverseInOrder();
+            System.out.print("Press 'y' to continue: ");
+            choice = reader.readLine();
+        } while (choice.equalsIgnoreCase("y"));
 
-        // Search for elements
-        int search1 = 40;
-        int search2 = 90;
-        System.out.println("Contains " + search1 + ": " + bst.contains(search1));
-        System.out.println("Contains " + search2 + ": " + bst.contains(search2));
+        // Display the structured tree
+        System.out.println("Tree Structure:");
+        bst.printTree();
     }
 }
