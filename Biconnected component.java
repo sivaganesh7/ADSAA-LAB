@@ -1,86 +1,118 @@
 import java.util.*;
 
-class BiconnectedComponents {
-    private int vertices;
-    private List<List<Integer>> adjList;
-    private int time;
+// This class represents an undirected graph using adjacency list representation
+public class biconnect_graph {
+    private int V, E; // Number of vertices & edges
+    private LinkedList<Integer>[] adj; // Adjacency List
 
-    public BiconnectedComponents(int vertices) {
-        this.vertices = vertices;
-        adjList = new ArrayList<>();
-        for (int i = 0; i < vertices; i++) {
-            adjList.add(new ArrayList<>());
+    // Count of biconnected components & discovery time tracking
+    static int count = 0, time = 0;
+
+    class Edge {
+        int u, v;
+        Edge(int u, int v) {
+            this.u = u;
+            this.v = v;
         }
-        time = 0;
     }
 
-    public void addEdge(int u, int v) {
-        adjList.get(u).add(v);
-        adjList.get(v).add(u);
+    // Constructor with proper generic type suppression
+    @SuppressWarnings("unchecked")
+    biconnect_graph(int v) {
+        V = v;
+        E = 0;
+        adj = new LinkedList[v];
+        for (int i = 0; i < v; ++i)
+            adj[i] = new LinkedList<Integer>();
     }
 
-    private void findBCCUtil(int u, int[] disc, int[] low, Stack<int[]> stack, int parent, boolean[] visited) {
-        visited[u] = true;
+    // Function to add an edge into the graph (undirected graph)
+    void addEdge(int v, int w) {
+        adj[v].add(w);
+        adj[w].add(v);
+        E++;
+    }
+
+    // DFS-based function to find and print biconnected components
+    void BCCUtil(int u, int disc[], int low[], LinkedList<Edge> st, int parent[]) {
+        // Initialize discovery time and low value
         disc[u] = low[u] = ++time;
         int children = 0;
 
-        for (int v : adjList.get(u)) {
-            if (!visited[v]) {
+        for (int v : adj[u]) {
+            if (disc[v] == -1) { // If v is not visited yet
                 children++;
-                stack.push(new int[]{u, v});
-                findBCCUtil(v, disc, low, stack, u, visited);
+                parent[v] = u;
+                st.add(new Edge(u, v));
+                BCCUtil(v, disc, low, st, parent);
 
+                // Update the low value
                 low[u] = Math.min(low[u], low[v]);
 
-                if ((parent == -1 && children > 1) || (parent != -1 && low[v] >= disc[u])) {
-                    System.out.print("BCC: ");
-                    while (true) {
-                        int[] edge = stack.pop();
-                        System.out.print("(" + edge[0] + ", " + edge[1] + ") ");
-                        if (edge[0] == u && edge[1] == v) break;
+                // If u is an articulation point, pop all edges from stack till u -- v
+                if ((disc[u] == 1 && children > 1) || (disc[u] > 1 && low[v] >= disc[u])) {
+                    while (!st.isEmpty() && (st.getLast().u != u || st.getLast().v != v)) {
+                        System.out.print(st.getLast().u + "--" + st.getLast().v + " ");
+                        st.removeLast();
                     }
-                    System.out.println();
+                    if (!st.isEmpty()) {
+                        System.out.println(st.getLast().u + "--" + st.getLast().v);
+                        st.removeLast();
+                    }
+                    count++;
                 }
-            } else if (v != parent && disc[v] < disc[u]) {
-                stack.push(new int[]{u, v});
+            } else if (v != parent[u]) { // Update low value if v is an ancestor
                 low[u] = Math.min(low[u], disc[v]);
+                st.add(new Edge(u, v));
             }
         }
     }
 
-    public void findBCC() {
-        int[] disc = new int[vertices];
-        int[] low = new int[vertices];
-        boolean[] visited = new boolean[vertices];
-        Stack<int[]> stack = new Stack<>();
+    // Function to find biconnected components
+    void BCC() {
+        int disc[] = new int[V];
+        int low[] = new int[V];
+        int parent[] = new int[V];
+        LinkedList<Edge> st = new LinkedList<>();
 
-        for (int i = 0; i < vertices; i++) {
-            if (!visited[i]) {
-                findBCCUtil(i, disc, low, stack, -1, visited);
-                if (!stack.isEmpty()) {
-                    System.out.print("BCC: ");
-                    while (!stack.isEmpty()) {
-                        int[] edge = stack.pop();
-                        System.out.print("(" + edge[0] + ", " + edge[1] + ") ");
-                    }
-                    System.out.println();
+        Arrays.fill(disc, -1);
+        Arrays.fill(low, -1);
+        Arrays.fill(parent, -1);
+
+        for (int i = 0; i < V; i++) {
+            if (disc[i] == -1)
+                BCCUtil(i, disc, low, st, parent);
+
+            // Print remaining components
+            if (!st.isEmpty()) {
+                while (!st.isEmpty()) {
+                    System.out.print(st.getLast().u + "--" + st.getLast().v + " ");
+                    st.removeLast();
                 }
+                System.out.println();
+                count++;
             }
         }
     }
 
-    public static void main(String[] args) {
-        BiconnectedComponents graph = new BiconnectedComponents(7);
-        graph.addEdge(0, 1);
-        graph.addEdge(1, 2);
-        graph.addEdge(1, 3);
-        graph.addEdge(2, 3);
-        graph.addEdge(3, 4);
-        graph.addEdge(4, 5);
-        graph.addEdge(5, 6);
-        graph.addEdge(4, 6);
+    public static void main(String args[]) {
+        biconnect_graph g = new biconnect_graph(12);
+        g.addEdge(0, 1);
+        g.addEdge(1, 2);
+        g.addEdge(1, 3);
+        g.addEdge(2, 3);
+        g.addEdge(2, 4);
+        g.addEdge(3, 4);
+        g.addEdge(1, 5);
+        g.addEdge(0, 6);
+        g.addEdge(5, 6);
+        g.addEdge(5, 7);
+        g.addEdge(5, 8);
+        g.addEdge(7, 8);
+        g.addEdge(8, 9);
+        g.addEdge(10, 11);
 
-        System.out.println("Biconnected Components:");
-        graph.findBCC();
+        g.BCC();
+        System.out.println("Above are " + g.count + " biconnected components in the graph");
     }
 }
