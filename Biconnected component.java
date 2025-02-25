@@ -52,11 +52,11 @@ public class biconnect_graph {
                 // If u is an articulation point, pop all edges from stack till u -- v
                 if ((disc[u] == 1 && children > 1) || (disc[u] > 1 && low[v] >= disc[u])) {
                     while (!st.isEmpty() && (st.getLast().u != u || st.getLast().v != v)) {
-                        System.out.print(st.getLast().u + "--" + st.getLast().v + " ");
+                        System.out.print("("+st.getLast().u + "--" + st.getLast().v + ") ");
                         st.removeLast();
                     }
                     if (!st.isEmpty()) {
-                        System.out.println(st.getLast().u + "--" + st.getLast().v);
+                        System.out.println("("+st.getLast().u + "--" + st.getLast().v+") ");
                         st.removeLast();
                     }
                     count++;
@@ -86,7 +86,7 @@ public class biconnect_graph {
             // Print remaining components
             if (!st.isEmpty()) {
                 while (!st.isEmpty()) {
-                    System.out.print(st.getLast().u + "--" + st.getLast().v + " ");
+                    System.out.print("("+st.getLast().u + "--" + st.getLast().v + ") ");
                     st.removeLast();
                 }
                 System.out.println();
