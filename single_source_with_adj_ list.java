@@ -71,5 +71,9 @@ class GFG {
         for (int i = 0; i < V; i++) {
             System.out.printf("%d %15d%n", i, distance[i]);
         }
+        long start = System.nanoTime();
+        long end = System.nanoTime();
+        System.out.println("Dijkstra (Adjacency List) Execution Time: " + (end - start) + " ns");
+    }
     }
 }
